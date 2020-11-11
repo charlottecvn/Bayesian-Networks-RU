@@ -1,6 +1,8 @@
 ### Assignment 1, Bayesian Network, TWINS
 ### Linda Schmeitz, Enrico Schmitz, Charlotte Cambier van Nooten
 
+# Data can be reached from https://github.com/AMLab-Amsterdam/CEVAE/tree/master/datasets/TWINS
+
 # Variables & paths to declare ----
 Path_dir = "/Users/charlottecvn/Downloads/BN/Assignment 1/TWINS"
 N_samples = 15000
