@@ -80,9 +80,7 @@ diabetes [pos="0.233,0.955"]
 dtotord_min [pos="0.560,0.959"]
 eclamp [pos="0.340,0.439"]
 feduc6 [pos="0.054,0.412"]
-fraceB [pos="0.059,0.830"]
-fraceO [pos="0.059,0.917"]
-fraceW [pos="0.059,0.747"]
+frace [pos="0.059,0.830"]
 hemo [pos="0.328,0.713"]
 herpes [pos="0.332,0.626"]
 hydra [pos="0.294,0.880"]
@@ -93,9 +91,7 @@ meduc6 [pos="0.051,0.333"]
 mort_0 [pos="0.876,0.377"]
 mort_1 [pos="0.876,0.512"]
 mpre5 [pos="0.569,0.803"]
-mraceB [pos="0.056,0.121"]
-mraceO [pos="0.059,0.206"]
-mraceW [pos="0.062,0.039"]
+mrace [pos="0.056,0.121"]
 phyper [pos="0.316,0.802"]
 pre4000 [pos="0.531,0.210"]
 preterm [pos="0.524,0.094"]
@@ -133,33 +129,15 @@ eclamp -> mort_0
 eclamp -> mort_1
 feduc6 -> alcohol
 feduc6 -> tobacco
-fraceO -> alcohol
-fraceO -> anemia
-fraceO -> cardiac
-fraceO -> diabetes
-fraceO -> eclamp
-fraceO -> hemo
-fraceO -> herpes
-fraceO -> phyper
-fraceO -> tobacco
-fraceB -> alcohol
-fraceB -> anemia
-fraceB -> cardiac
-fraceB -> diabetes
-fraceB -> eclamp
-fraceB -> hemo
-fraceB -> herpes
-fraceB -> phyper
-fraceB -> tobacco
-fraceW -> alcohol
-fraceW -> anemia
-fraceW -> cardiac
-fraceW -> diabetes
-fraceW -> eclamp
-fraceW -> hemo
-fraceW -> herpes
-fraceW -> phyper
-fraceW -> tobacco
+frace -> alcohol
+frace -> anemia
+frace -> cardiac
+frace -> diabetes
+frace -> eclamp
+frace -> hemo
+frace -> herpes
+frace -> phyper
+frace -> tobacco
 hemo -> dbirwt_0
 hemo -> dbirwt_1
 hemo -> dtotord_min
@@ -190,33 +168,15 @@ mort_0 -> dtotord_min
 mort_1 -> dtotord_min
 mpre5 -> dbirwt_0
 mpre5 -> dbirwt_1
-mraceW -> alcohol
-mraceW -> anemia
-mraceW -> cardiac
-mraceW -> diabetes
-mraceW -> eclamp
-mraceW -> hemo
-mraceW -> herpes
-mraceW -> phyper
-mraceW -> tobacco
-mraceB -> alcohol
-mraceB -> anemia
-mraceB -> cardiac
-mraceB -> diabetes
-mraceB -> eclamp
-mraceB -> hemo
-mraceB -> herpes
-mraceB -> phyper
-mraceB -> tobacco
-mraceO -> alcohol
-mraceO -> anemia
-mraceO -> cardiac
-mraceO -> diabetes
-mraceO -> eclamp
-mraceO -> hemo
-mraceO -> herpes
-mraceO -> phyper
-mraceO -> tobacco
+mrace -> alcohol
+mrace -> anemia
+mrace -> cardiac
+mrace -> diabetes
+mrace -> eclamp
+mrace -> hemo
+mrace -> herpes
+mrace -> phyper
+mrace -> tobacco
 phyper -> dbirwt_0
 phyper -> dbirwt_1
 phyper -> dtotord_min
@@ -268,14 +228,12 @@ for (val in colnames_other){
   Dataset_int[,val] <- factor(Dataset_int[ , val], ordered = TRUE, levels = seq(1,max(range_levels)))
 }
 
-Dataset_int$mraceW <- ifelse(Dataset_int$mrace == 1, 1, 0)
-Dataset_int$mraceB <- ifelse(Dataset_int$mrace == 2, 1, 0)
-Dataset_int$mraceO <- ifelse(Dataset_int$mrace >= 3, 1, 0)
-Dataset_int$fraceW <- ifelse(Dataset_int$frace == 1, 1, 0)
-Dataset_int$fraceB <- ifelse(Dataset_int$frace == 2, 1, 0)
-Dataset_int$fraceO <- ifelse(Dataset_int$frace >= 3, 1, 0)
-Dataset_int$mrace <- NULL
-Dataset_int$frace <- NULL
+Dataset_int$mrace <- ifelse(Dataset_int$mrace == 1, 1, Dataset_int$mrace )
+Dataset_int$mrace <- ifelse(Dataset_int$mrace == 2, 2, Dataset_int$mrace )
+Dataset_int$mrace <- ifelse(Dataset_int$mrace >= 3, 3, Dataset_int$mrace )
+Dataset_int$frace <- ifelse(Dataset_int$frace == 1, 1, Dataset_int$mrace )
+Dataset_int$frace <- ifelse(Dataset_int$frace == 2, 2, Dataset_int$mrace )
+Dataset_int$frace <- ifelse(Dataset_int$frace >= 3, 3, Dataset_int$mrace )
 
 Dataset_int$mager8 <- ifelse(Dataset_int$mager8 <=2, 1, Dataset_int$mager8)
 Dataset_int$mager8 <- ifelse((Dataset_int$mager8 >=3) & (Dataset_int$mager8 <=5) , 2, Dataset_int$mager8)
@@ -307,13 +265,11 @@ for (col in names(Dataset_int)){
     max_uni = uni
   }
 }
-print(max_uni) 
 Variable_dataframe <- matrix(0, max_uni, ncol(Dataset_int))
 colnames(Variable_dataframe) <- colnames(Dataset_int)
 rownames(Variable_dataframe) <- seq(0, nrow(Variable_dataframe)-1)
 n = 1
 for (col in names(Dataset_int)){
-  print(col)
   tab <- table(Dataset_int[col])
   m = 1
   for (value in tab){
@@ -340,8 +296,8 @@ p_rmsea_cutoff <- high_p[which(high_p$rmsea < rmsea_cutoff),]
 
 full_names <- sort(colnames(Dataset_int))
 short_names <- c("alch", "anem", "crdc", "csex", "db_0", "db_1", "dbts" ,"dtt_", 
-                 "eclm" ,"fdc6" ,"frcB","frcO","frcW" ,"hemo", "hrps", "hydr", "incr", "lung", 
-                 "mgr8" ,"mdc6","mr_0", "mr_1", "mpr5",  "mrcB","mrcO","mrcW" ,"phyp", "p400" ,
+                 "eclm" ,"fdc6" ,"frac" ,"hemo", "hrps", "hydr", "incr", "lung", 
+                 "mgr8" ,"mdc6","mr_0", "mr_1", "mpr5",  "mrac" ,"phyp", "p400" ,
                  "prtr" ,"renl" ,"tbcc")
 
 replace_var_name <- function(var_name, full_names, short_names){
@@ -418,13 +374,11 @@ for (col in names(Dataset_merge)){
     max_uni = uni
   }
 }
-print(max_uni) 
 Variable_dataframe <- matrix(0, max_uni, ncol(Dataset_merge))
 colnames(Variable_dataframe) <- colnames(Dataset_merge)
 rownames(Variable_dataframe) <- seq(0, nrow(Variable_dataframe)-1)
 n = 1
 for (col in names(Dataset_merge)){
-  print(col)
   tab <- table(Dataset_merge[col])
   m = 1
   for (value in tab){
@@ -452,17 +406,13 @@ dbirwt_1 [pos="0.671,0.519"]
 diseases [pos="0.500,0.500"]
 dtotord_min [pos="0.560,0.959"]
 feduc6 [pos="0.041,0.722"]
-fraceB [pos="0.158,0.932"]
-fraceO [pos="0.232,1.019"]
-fraceW [pos="0.104,0.852"]
+frace [pos="0.158,0.932"]
 mager8 [pos="0.156,0.454"]
 meduc6 [pos="0.045,0.297"]
 mort_0 [pos="0.876,0.377"]
 mort_1 [pos="0.876,0.512"]
 mpre5 [pos="0.569,0.803"]
-mraceB [pos="0.159,0.074"]
-mraceO [pos="0.089,0.164"]
-mraceW [pos="0.229,-0.006"]
+mrace [pos="0.159,0.074"]
 pre4000 [pos="0.531,0.210"]
 preterm [pos="0.524,0.094"]
 tobacco [pos="0.342,0.619"]
@@ -484,15 +434,9 @@ diseases -> mort_1
 diseases -> pre4000
 feduc6 -> alcohol
 feduc6 -> tobacco
-fraceO -> alcohol
-fraceO -> diseases
-fraceO -> tobacco
-fraceB -> alcohol
-fraceB -> diseases
-fraceB -> tobacco
-fraceW -> alcohol
-fraceW -> diseases
-fraceW -> tobacco
+frace -> alcohol
+frace -> diseases
+frace -> tobacco
 diseases -> preterm
 mager8 -> alcohol
 mager8 -> diseases
@@ -505,15 +449,9 @@ mort_0 -> dtotord_min
 mort_1 -> dtotord_min
 mpre5 -> dbirwt_0
 mpre5 -> dbirwt_1
-mraceW -> alcohol
-mraceW -> diseases
-mraceW -> tobacco
-mraceB -> alcohol
-mraceB -> diseases
-mraceB -> tobacco
-mraceO -> alcohol
-mraceO -> diseases
-mraceO -> tobacco
+mrace -> alcohol
+mrace -> diseases
+mrace -> tobacco
 pre4000 -> dbirwt_0
 pre4000 -> dbirwt_1
 preterm -> dbirwt_0
@@ -538,11 +476,11 @@ plotLocalTestResults(localtests_dag_merge)
 p_values <- localtests_dag_merge[order(localtests_dag_merge$p.value,decreasing=TRUE),]
 high_p <- p_values[which(p_values$p.value < alpha),] 
 p_rmsea_cutoff <- high_p[which(high_p$rmsea < rmsea_cutoff),]
-p_rmsea_cutoff <- p_rmsea_cutoff[c(0:2, 4:nrow(p_rmsea_cutoff)),]
+p_rmsea_cutoff <- p_rmsea_cutoff[c(1:nrow(p_rmsea_cutoff)),]
 
 full_names <- sort(colnames(Dataset_merge)) 
-short_names <- c("alch", "csex", "db_0", "db_1","dsss", "dtt_","fdc6" ,"frcB","frcO","frcW", 
-                 "mgr8" ,"mdc6","mr_0", "mr_1", "mpr5",  "mrcB","mrcO","mrcW", "p400" ,
+short_names <- c("alch", "csex", "db_0", "db_1","dsss", "dtt_","fdc6" ,"frac", 
+                 "mgr8" ,"mdc6","mr_0", "mr_1", "mpr5",  "mrac", "p400" ,
                  "prtr" ,"tbcc")
 
 test_extra <- extra_variables_dag(p_rmsea_cutoff, full_names, short_names)
