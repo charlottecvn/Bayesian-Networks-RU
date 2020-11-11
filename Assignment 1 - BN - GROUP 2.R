@@ -198,7 +198,7 @@ tobacco -> lung
 }
 ')
 title = "Dagitty"
-jpeg(file = file.path(output_dir,paste(title,".jpg")), res = 100, height =960, width = 960 )
+jpeg(file = file.path(output_dir,paste(title,".jpg")), res = 100, height =1200, width = 1000 )
 plot(DAG)
 graphics.off()
 
