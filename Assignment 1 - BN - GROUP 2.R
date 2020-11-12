@@ -4,9 +4,9 @@
 # Data can be reached from https://github.com/AMLab-Amsterdam/CEVAE/tree/master/datasets/TWINS
 
 # Variables & paths to declare ----
-Path_dir = "/Users/charlottecvn/Downloads/BN/Assignment 1/TWINS"
+Path_dir = "/Users/charlottecvn/Downloads/BN/Assignment 1/TWINS" #Should be set to reach the data from a folder
 N_samples = 15000
-output_dir = "/Users/charlottecvn/Downloads/BN/Assignment 1/"
+output_dir = "/Users/charlottecvn/Downloads/BN/Assignment 1/" #Should be set to store the plots in a folder
 alpha <- 0.05
 rmsea_cutoff <- 0.08
 
