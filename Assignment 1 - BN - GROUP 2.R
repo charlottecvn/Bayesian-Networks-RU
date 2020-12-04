@@ -4,11 +4,11 @@
 # Data can be reached from https://github.com/AMLab-Amsterdam/CEVAE/tree/master/datasets/TWINS
 
 # Variables & paths to declare ----
-Path_dir = "/Users/charlottecvn/Downloads/BN/Assignment 1/TWINS" #Should be set to reach the data from a folder
+Path_dir = "/Users/charlottecvn/Programming/RStudio/Bayesian Networks/Assignment 1 (BN)/" #Should be set to reach the data from a folder
 N_samples = 15000
-output_dir = "/Users/charlottecvn/Downloads/BN/Assignment 1/" #Should be set to store the plots in a folder
+output_dir = "/Users/charlottecvn/Programming/RStudio/Bayesian Networks/Assignment 1 (BN)/" #Should be set to store the plots in a folder (or getwd())
 alpha <- 0.05
-rmsea_cutoff <- 0.08
+rmsea_cutoff <- 1-0.08
 
 # Libraries ----
 library(plyr)
@@ -20,13 +20,13 @@ library(psych)
 library( bayesianNetworks)
 
 # Paths ----
-try(setwd(Path_dir))
+#try(setwd(Path_dir))
 pdf_file = file.path(output_dir, "Plots.pdf")
 
 # Read datasets ----
-X_ds <- read.csv(file = 'twin_pairs_X_3years_samesex.csv', stringsAsFactors = FALSE)
-Y_ds <- read.csv(file = 'twin_pairs_Y_3years_samesex.csv', stringsAsFactors = FALSE)
-T_ds <- read.csv(file = 'twin_pairs_T_3years_samesex.csv', stringsAsFactors = FALSE)
+X_ds <- read.csv(file = 'TWINS (data)/twin_pairs_X_3years_samesex.csv', stringsAsFactors = FALSE)
+Y_ds <- read.csv(file = 'TWINS (data)/twin_pairs_Y_3years_samesex.csv', stringsAsFactors = FALSE)
+T_ds <- read.csv(file = 'TWINS (data)/twin_pairs_T_3years_samesex.csv', stringsAsFactors = FALSE)
 
 XY <- merge(X_ds,Y_ds,by = "X") # Merge files to 1 dataframe
 Dataset <- merge(XY,T_ds,by = "X") 
@@ -56,7 +56,7 @@ Dataset <- Dataset[ , order(names(Dataset))]
 
 # Weight distribution ----
 title = "Birthweight distribution"
-jpeg(file = file.path(output_dir,paste(title,".jpg")), res = 100)
+jpeg(file = file.path(output_dir,paste(title,sep="",".jpg")), res = 100)
 par(mfrow=c(2,1))
 br=100
 xlab = "Birthweight (gram)"
@@ -198,7 +198,7 @@ tobacco -> lung
 }
 ')
 title = "Dagitty"
-jpeg(file = file.path(output_dir,paste(title,".jpg")), res = 100, height =1200, width = 1000 )
+jpeg(file = file.path(output_dir,paste(title,".jpg")), res = 100, height =1200, width = 960 )
 plot(DAG)
 graphics.off()
 
@@ -229,11 +229,9 @@ for (val in colnames_other){
 }
 
 Dataset_int$mrace <- ifelse(Dataset_int$mrace == 1, 1, Dataset_int$mrace )
-Dataset_int$mrace <- ifelse(Dataset_int$mrace == 2, 2, Dataset_int$mrace )
-Dataset_int$mrace <- ifelse(Dataset_int$mrace >= 3, 3, Dataset_int$mrace )
+Dataset_int$mrace <- ifelse(Dataset_int$mrace >= 2, 2, Dataset_int$mrace )
 Dataset_int$frace <- ifelse(Dataset_int$frace == 1, 1, Dataset_int$mrace )
-Dataset_int$frace <- ifelse(Dataset_int$frace == 2, 2, Dataset_int$mrace )
-Dataset_int$frace <- ifelse(Dataset_int$frace >= 3, 3, Dataset_int$mrace )
+Dataset_int$frace <- ifelse(Dataset_int$frace >= 2, 2, Dataset_int$mrace )
 
 Dataset_int$mager8 <- ifelse(Dataset_int$mager8 <=2, 1, Dataset_int$mager8)
 Dataset_int$mager8 <- ifelse((Dataset_int$mager8 >=3) & (Dataset_int$mager8 <=5) , 2, Dataset_int$mager8)
@@ -292,7 +290,7 @@ plotLocalTestResults(localtests_dag)
 
 p_values <- localtests_dag[order(localtests_dag$p.value,decreasing=TRUE),]
 high_p <- p_values[which(p_values$p.value < alpha),] 
-p_rmsea_cutoff <- high_p[which(high_p$rmsea < rmsea_cutoff),]
+p_rmsea_cutoff <- high_p[which(high_p$rmsea > rmsea_cutoff),]
 
 full_names <- sort(colnames(Dataset_int))
 short_names <- c("alch", "anem", "crdc", "csex", "db_0", "db_1", "dbts" ,"dtt_", 
@@ -315,7 +313,7 @@ extra_variables_dag <- function(p_rmsea_cutoff, full_names, short_names){
     
     var1 <- replace_var_name(var1, full_names,short_names)
     var2 <- replace_var_name(var2, full_names,short_names)
-
+    
     list_all <- append(list_all, paste(var1, var2, sep = " -> "))
     
     if (num_char > 14){
@@ -475,7 +473,7 @@ plotLocalTestResults(localtests_dag_merge)
 
 p_values <- localtests_dag_merge[order(localtests_dag_merge$p.value,decreasing=TRUE),]
 high_p <- p_values[which(p_values$p.value < alpha),] 
-p_rmsea_cutoff <- high_p[which(high_p$rmsea < rmsea_cutoff),]
+p_rmsea_cutoff <- high_p[which(high_p$rmsea > rmsea_cutoff),]
 p_rmsea_cutoff <- p_rmsea_cutoff[c(1:nrow(p_rmsea_cutoff)),]
 
 full_names <- sort(colnames(Dataset_merge)) 
