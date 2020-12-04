@@ -10,6 +10,7 @@ output_dir = "/Users/charlottecvn/Programming/RStudio/Bayesian Networks/Assignme
 alpha <- 0.05
 rmsea_cutoff <- 1-0.08
 
+
 # Libraries ----
 library(plyr)
 library(dagitty)
@@ -41,7 +42,6 @@ Dataset <- Dataset[Dataset$gestat10 == 6,]
 Dataset <- Dataset[-Dataset$gestat10]
 
 # Get N samples
-Dataset <- Dataset[complete.cases(Dataset), ] #nan
 Dataset <- head(Dataset,N_samples)
 
 # Keep variables based on knowledge
@@ -254,35 +254,47 @@ Dataset_int$dbirwt_1 <- ifelse(Dataset_int$dbirwt_1 >3500, 4, Dataset_int$dbirwt
 
 Dataset_int$dtotord_min <- ifelse(Dataset_int$dtotord_min >=4, 4, Dataset_int$dtotord_min)
 
-# Distribution variables ----
-Nsamples = nrow(Dataset_int)
-max_uni = 0
-for (col in names(Dataset_int)){
-  uni = length(table(Dataset_int[col]))
-  if (max_uni < uni){
-    max_uni = uni
+Dataset_int_nan <- Dataset_int
+
+# Remove NaN
+Dataset_int <- Dataset_int[complete.cases(Dataset_int), ] 
+# Get N samples
+Dataset_int <- head(Dataset_int,N_samples)
+
+# Distribution variables -----
+distr_var_plot <- function (Dataset, title_plot){
+  Nsamples = nrow(Dataset)
+  max_uni = 0
+  for (col in names(Dataset)){
+    uni = length(table(Dataset[col]))
+    if (max_uni < uni){
+      max_uni = uni
+    }
   }
-}
-Variable_dataframe <- matrix(0, max_uni, ncol(Dataset_int))
-colnames(Variable_dataframe) <- colnames(Dataset_int)
-rownames(Variable_dataframe) <- seq(0, nrow(Variable_dataframe)-1)
-n = 1
-for (col in names(Dataset_int)){
-  tab <- table(Dataset_int[col])
-  m = 1
-  for (value in tab){
-    Variable_dataframe[m,n] <- (value/Nsamples)*100
-    m <- m+1
+  Variable_dataframe <- matrix(0, max_uni, ncol(Dataset))
+  colnames(Variable_dataframe) <- colnames(Dataset)
+  rownames(Variable_dataframe) <- seq(0, nrow(Variable_dataframe)-1)
+  n = 1
+  for (col in names(Dataset)){
+    tab <- table(Dataset[col])
+    m = 1
+    for (value in tab){
+      Variable_dataframe[m,n] <- (value/Nsamples)*100
+      m <- m+1
+    }
+    n <- n+1
   }
-  n <- n+1
+  title = title_plot
+  jpeg(file = file.path(output_dir,paste(title,sep="",".jpg")), res = 100, height =400, width = 1000 )
+  par(mar = c(4, 4, 4, 5),xpd = TRUE)
+  barplot(Variable_dataframe, las=2,col = rainbow(max_uni), main = gsub("_"," ", title), ylab = "Percentage (%)",cex.names=0.8)
+  legend(40,100, c("0","1","2","3"), col=rainbow(max_uni), pch=22, pt.bg = rainbow(max_uni))
+  graphics.off()
 }
 
-title = "Barplot_variables"
-jpeg(file = file.path(output_dir,paste(title,".jpg")), res = 100, height =400, width = 1000 )
-par(mar = c(4, 4, 4, 5),xpd = TRUE)
-barplot(Variable_dataframe, las=2,col = rainbow(max_uni), main = "Variable distribution", ylab = "Percentage (%)",cex.names=0.8)
-legend(40,100, c("0","1","2","3"), col=rainbow(max_uni), pch=22, pt.bg = rainbow(max_uni))
-graphics.off()
+distr_var_plot(Dataset_int_nan,"Barplot_variables_with_NaN")
+
+distr_var_plot(Dataset_int,"Barplot_variables_without_NaN")
 
 # Localtets (Chisq) ------
 localtests_dag <- localTests(DAG, Dataset_int, type='cis.chisq', max.conditioning.variables = 2)
