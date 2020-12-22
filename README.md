@@ -20,6 +20,13 @@ After declaring, following libraries must be installed:
 ## Assignment 2 - Instructions: 
 At the top of the R files, the variables and paths can be declared.
 After declaring, following libraries must be installed:
-*
-*
-*
+* plyr
+* dagitty
+* tidyverse
+* pcalg
+* energy
+* BiocManager::install("graph")
+* BiocManager::install("RBGL")
+* BiocManager::install("Rgraphviz")
+
+Attachment is added with comparison of three chosen skeletons[(.csv file)](https://github.com/charlottecvn/Bayesian-Networks-RU/blob/main/PC%20compare%20skeletons.csv)
