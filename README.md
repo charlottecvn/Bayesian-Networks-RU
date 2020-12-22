@@ -29,4 +29,4 @@ After declaring, following libraries must be installed:
 * BiocManager::install("RBGL")
 * BiocManager::install("Rgraphviz")
 
-Attachment is added with comparison of three chosen skeletons[(.csv file)](https://github.com/charlottecvn/Bayesian-Networks-RU/blob/main/PC%20compare%20skeletons.csv)
+Attachment is added with comparison of three chosen skeletons[(.csv file)](https://github.com/charlottecvn/Bayesian-Networks-RU/blob/main/Compare%20skeletons%20-%20assignment%202.csv)
