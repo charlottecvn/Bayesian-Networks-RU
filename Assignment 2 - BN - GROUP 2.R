@@ -8,15 +8,11 @@ Path_dir = "/Users/charlottecvn/Programming/RStudio/Bayesian Networks/Assignment
 N_samples = 15000
 output_dir = "/Users/charlottecvn/Programming/RStudio/Bayesian Networks/Assignment 2 (BN)/"
 alpha <- 0.05
-rmsea_cutoff <- 0.08
 
 # Libraries ----
 library(plyr)
 library(dagitty)
 library(tidyverse)
-library(psych)
-library(bayesianNetworks)
-
 library(bnlearn)
 library(pcalg)
 library(energy)
@@ -26,8 +22,7 @@ BiocManager::install("RBGL")
 BiocManager::install("Rgraphviz")
 
 # Paths ----
-#try(setwd(Path_dir))
-#pdf_file = file.path(output_dir, "Plots.pdf")
+try(setwd(Path_dir))
 
 # Read datasets ----
 X_ds <- read.csv(file = 'TWINS (data)/twin_pairs_X_3years_samesex.csv', stringsAsFactors = FALSE)
@@ -136,47 +131,6 @@ for (i in colnames(Dataset_num)){
   print(mvnorm.etest(Dataset_num$i, R=10))
 } # All variables are multivariate normal (p-value < 0.05), Energy test of multivariate normality
 
-# Naive Structure Learning, bnlearn ----
-
-# pc.stable 
-fit_pc <- pc.stable(Dataset_int)
-fit_pc
-
-plot.new()
-title = "Fit PC (pc.stable, bnlearn)"
-jpeg(file = paste(title,".jpg"), res = 100, height =1200, width = 960 )
-plot(fit_pc)
-graphics.off()
-
-# hc
-fit_hc <- hc(Dataset_int)
-fit_hc
-
-plot.new()
-title = "Fit HC (hc, bnlearn)"
-jpeg(file = paste(title,".jpg"), res = 100, height =1200, width = 960 )
-plot(fit_hc)
-graphics.off()
-
-# tabu
-fit_tabu <- tabu(Dataset_int)
-fit_tabu
-
-plot.new()
-title = "Fit TABU (tabu, bnlearn)"
-jpeg(file = paste(title,".jpg"), res = 100, height =1200, width = 960 )
-plot(fit_tabu)
-graphics.off()
-
-# si.hiton.pc
-fit_si <- si.hiton.pc(Dataset_int)
-fit_si
-
-plot.new()
-title = "Fit SI (si.hiton.pc, bnlearn)"
-jpeg(file = paste(title,".jpg"), res = 100, height =1200, width = 960 )
-plot(fit_si)
-graphics.off()
 
 # Naive Structure Learning, pcalg ----
 
@@ -191,20 +145,48 @@ suffStat <- list(dm=Dataset_num, nlev=nlev, adaptDF=FALSE) #list(C=cor(Dataset_n
 
 # pc
 pc.fit <- pc(suffStat, indepTest, labels = V, p = p, alpha = alpha, verbose = TRUE)
+pc.fit_alpha10 <- pc(suffStat, indepTest, labels = V, p = p, alpha = 0.10, verbose = FALSE)
+pc.fit_alpha01 <- pc(suffStat, indepTest, labels = V, p = p, alpha = 0.01, verbose = FALSE)
 
 plot.new()
-title = "Fit PC (pc, pcalg)"
+title = "Fit PC (pc, pcalg), alpha = 0.05"
 jpeg(file = paste(title,".jpg"), res = 100, height =1500, width = 1500 )
 plot(pc.fit)
 graphics.off()
 
-# rfci
-rfci.fit <- rfci(suffStat, indepTest, labels = V, p = p, alpha = alpha, verbose = TRUE)
+plot.new()
+title = "Fit PC (pc, pcalg), alpha = 0.01"
+jpeg(file = paste(title,".jpg"), res = 100, height =1500, width = 1500 )
+plot(pc.fit_alpha01)
+graphics.off()
 
 plot.new()
-title = "Fit RFCI (rfci, pcalg)"
+title = "Fit PC (pc, pcalg), alpha = 0.10"
+jpeg(file = paste(title,".jpg"), res = 100, height =1500, width = 1500 )
+plot(pc.fit_alpha10)
+graphics.off()
+
+# rfci
+rfci.fit <- rfci(suffStat, indepTest, labels = V, p = p, alpha = alpha, verbose = TRUE)
+rfci.fit_alpha01 <- rfci(suffStat, indepTest, labels = V, p = p, alpha = 0.01, verbose = FALSE)
+rfci.fit_alpha10 <- rfci(suffStat, indepTest, labels = V, p = p, alpha = 0.10, verbose = FALSE)
+
+plot.new()
+title = "Fit RFCI (rfci, pcalg), alpha = 0.05"
 jpeg(file = paste(title,".jpg"), res = 100, height =1500, width = 1500 )
 plot(rfci.fit)
+graphics.off()
+
+plot.new()
+title = "Fit RFCI (rfci, pcalg), alpha = 0.01"
+jpeg(file = paste(title,".jpg"), res = 100, height =1500, width = 1500 )
+plot(rfci.fit_alpha01)
+graphics.off()
+
+plot.new()
+title = "Fit RFCI (rfci, pcalg), alpha = 0.10"
+jpeg(file = paste(title,".jpg"), res = 100, height =1500, width = 1500 )
+plot(rfci.fit_alpha10)
 graphics.off()
 
 # GES (greedy, BIC)
@@ -216,4 +198,15 @@ title = "Estimated CPDAG, forward (ges, pcalg)"
 jpeg(file = paste(title,".jpg"), res = 100, height =1500, width = 1500 )
 plot(ges.fit_forward$essgraph)
 graphics.off()
+
+# Distance measures ----
+
+#Structural Hamming Distance (SHD)
+shd.val_pc1 <- shd(pc.fit_alpha01, pc.fit)
+shd.val_pc2 <- shd(pc.fit, pc.fit_alpha10)
+shd.val_pc3 <- shd(pc.fit_alpha01, pc.fit_alpha10)
+print(shd.val_pc1)
+print(shd.val_pc2)
+print(shd.val_pc3)
+
 
